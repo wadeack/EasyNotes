@@ -152,6 +152,15 @@ fun BottomModal(viewModel: EditViewModel) {
                 }
             )
             SettingsBox(
+                title = "Last Updated at",
+                icon = Icons.Rounded.Numbers,
+                radius = arrayOf(16.dp, 16.dp, 0.dp, 0.dp),
+                customAction = {
+                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    Text(sdf.format(viewModel.noteUpdatedTime.value).toString())
+                }
+            )
+            SettingsBox(
                 title = "Words",
                 icon = Icons.Rounded.Numbers,
                 radius = arrayOf(0.dp, 0.dp, 0.dp, 0.dp),

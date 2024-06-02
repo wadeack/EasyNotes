@@ -24,6 +24,9 @@ class EditViewModel : NoteViewModel() {
     private val _noteCreatedTime = mutableLongStateOf(System.currentTimeMillis())
     val noteCreatedTime: State<Long> get() = _noteCreatedTime
 
+    private val _noteUpdatedTime = mutableLongStateOf(System.currentTimeMillis())
+    val noteUpdatedTime: State<Long> get() = _noteUpdatedTime
+
     private val _isNoteInfoVisible = mutableStateOf(false)
     val isNoteInfoVisible: State<Boolean> get() = _isNoteInfoVisible
 
@@ -40,7 +43,8 @@ class EditViewModel : NoteViewModel() {
             val note = Note(
                 id = id,
                 name = noteName.value.text,
-                description = noteDescription.value.text
+                description = noteDescription.value.text,
+                updatedAt = System.currentTimeMillis()
             )
 
             when (note.id) {
@@ -54,6 +58,7 @@ class EditViewModel : NoteViewModel() {
         updateNoteName(TextFieldValue(note.name, selection = TextRange(note.name.length)))
         updateNoteDescription(TextFieldValue(note.description, selection = TextRange(note.name.length)))
         updateNoteCreatedTime(note.createdAt)
+        updateNoteUpdatedTime(note.updatedAt)
         updateNoteId(note.id)
     }
 
@@ -67,6 +72,10 @@ class EditViewModel : NoteViewModel() {
 
     private fun updateNoteCreatedTime(newTime: Long) {
         _noteCreatedTime.longValue = newTime
+    }
+
+    private fun updateNoteUpdatedTime(newTime: Long) {
+        _noteUpdatedTime.longValue = newTime
     }
 
     private fun updateNoteId(newId: Int) {

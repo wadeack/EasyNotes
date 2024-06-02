@@ -16,7 +16,7 @@ abstract class NoteDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun addNote(note: Note)
 
-    @Query("SELECT * FROM `notes-table`")
+    @Query("SELECT * FROM `notes-table` ORDER BY updated_at DESC")
     abstract fun getAllNotes(): Flow<List<Note>>
 
     @Update

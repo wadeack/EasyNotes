@@ -17,6 +17,13 @@ object DatabaseHolder {
         }
     }
 
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `notes-table` ADD COLUMN `updated_at` INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}")
+            db.execSQL("UPDATE `notes-table` SET `updated_at` = `created_at`")
+        }
+    }
+
     val noteRepository by lazy {
         NoteRepository(noteDao = database.noteDao())
     }
@@ -24,6 +31,7 @@ object DatabaseHolder {
     fun provide(context: Context) {
         database = Room.databaseBuilder(context, NoteDatabase::class.java, "note-list.db")
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
     }
 }
