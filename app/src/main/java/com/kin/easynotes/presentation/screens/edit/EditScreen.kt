@@ -1,6 +1,8 @@
 package com.kin.easynotes.presentation.screens.edit
 
+import android.graphics.Rect
 import android.icu.text.SimpleDateFormat
+import android.view.ViewTreeObserver
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -170,8 +172,29 @@ fun BottomModal(viewModel: EditViewModel) {
 }
 
 @Composable
+fun keyboardHeightAsState(): State<Float> {
+    val keyboardHeight = remember { mutableStateOf(-1F) }
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = Rect()
+            view.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = view.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            keyboardHeight.value = keypadHeight.toFloat()/screenHeight
+        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
+
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener)
+        }
+    }
+    return keyboardHeight
+}
+
+@Composable
 fun EditScreen(viewModel: EditViewModel) {
-    val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    val keyboardHeight by keyboardHeightAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -184,6 +207,8 @@ fun EditScreen(viewModel: EditViewModel) {
             onValueChange = { viewModel.updateNoteName(it) },
             placeholder = "Name",
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            modifier = Modifier
+                .heightIn(max = 56.dp)
         )
         Spacer(modifier = Modifier.height(2.dp))
         CustomTextField(
@@ -192,8 +217,8 @@ fun EditScreen(viewModel: EditViewModel) {
             placeholder = "Description",
             shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
             modifier = Modifier
-                .fillMaxHeight(if (isKeyboardVisible) 0.90f else 1f)
-                .padding(bottom = if (isKeyboardVisible) 0.dp else 16.dp)
+                .fillMaxHeight(if (keyboardHeight > 0) (0.8F-keyboardHeight) else 1f)
+                .padding(bottom = if (keyboardHeight > 0) 0.dp else 16.dp)
         )
         TextFormattingToolbar(viewModel)
     }
@@ -217,6 +242,7 @@ fun PreviewScreen(viewModel: EditViewModel, onClick: () -> Unit) {
                     shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                 )
                 .padding(14.dp)
+                .heightIn(max = 27.dp)
                 .clickable { onClick() },
             onContentChange = { viewModel.updateNoteName(TextFieldValue(text = it)) }
         )
