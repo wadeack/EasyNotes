@@ -129,10 +129,7 @@ fun NotesGrid(navController: NavController, viewModel: HomeViewModel, notes: Lis
                 NoteCard(
                     viewModel = viewModel,
                     note = note,
-                    containerColor = when {
-                        viewModel.selectedNotes.contains(note.id) -> MaterialTheme.colorScheme.surfaceContainerHighest
-                        else ->  MaterialTheme.colorScheme.surfaceContainerHigh
-                    },
+                    isSelected = viewModel.selectedNotes.contains(note.id),
                     settings,
                     onShortClick = {
                         when {
@@ -162,12 +159,25 @@ fun NotesGrid(navController: NavController, viewModel: HomeViewModel, notes: Lis
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NoteCard(viewModel: HomeViewModel,note: Note, containerColor : Color,settings: SettingsViewModel? = null, onShortClick : () -> Unit, onLongClick : () -> Unit) {
+private fun NoteCard(viewModel: HomeViewModel, note: Note, isSelected : Boolean, settings: SettingsViewModel? = null,
+                     onShortClick : () -> Unit, onLongClick : () -> Unit) {
+    val boxBgColor: Color
+    val contentBgColor: Color
+    when {
+        isSelected -> {
+            boxBgColor = MaterialTheme.colorScheme.outline
+            contentBgColor = MaterialTheme.colorScheme.outlineVariant
+        }
+        else ->  {
+            boxBgColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            contentBgColor = MaterialTheme.colorScheme.surfaceContainer
+        }
+    }
     Box(
         modifier = Modifier
             .padding(bottom = 9.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(containerColor)
+            .background(boxBgColor)
             .combinedClickable(
                 onClick = { onShortClick() },
                 onLongClick = { onLongClick() }
@@ -197,7 +207,7 @@ private fun NoteCard(viewModel: HomeViewModel,note: Note, containerColor : Color
                     markdown = note.description,
                     modifier = Modifier
                         .background(
-                            color = if (settings?.amoledTheme ?: false) Color.Black else MaterialTheme.colorScheme.surfaceContainerHigh,
+                            color = contentBgColor,
                             shape = RoundedCornerShape(9.dp)
                         )
                         .heightIn(max = 100.dp)
