@@ -52,6 +52,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .padding(12.dp, 0.dp, 12.dp, 8.dp)
+                        .heightIn(max = 128.dp)
                 )
                 LaunchedEffect(true) {
                     focusRequester.requestFocus()
